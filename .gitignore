@@ -1,0 +1,31 @@
+# .NET build artifacts
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Visual Studio/JetBrains/Rider
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Other
+*.swp
+*.tmp
+
+# Node
+node_modules/
+
+# Secrets (if any local)
+secrets.json
+appsettings.Development.local.json

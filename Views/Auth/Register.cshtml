@@ -1,0 +1,407 @@
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SIMS_APDP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .register-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+        }
+        .register-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .register-body {
+            padding: 40px;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        .btn-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-register:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .invalid-feedback {
+            display: block;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+        @@@@@@media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h2><i class="fas fa-user-plus me-2"></i>Create Account</h2>
+            <p class="mb-0">Student Information Management System</p>
+        </div>
+        
+        <div class="register-body">
+            <div id="alert-container"></div>
+            
+            <form id="registerForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group mb-3">
+                        <label for="firstName" class="form-label">
+                            <i class="fas fa-user me-2"></i>First Name
+                        </label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        <div class="invalid-feedback" id="firstName-error"></div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="lastName" class="form-label">
+                            <i class="fas fa-user me-2"></i>Last Name
+                        </label>
+                        <input type="text" class="form-control" id="lastName" name="lastName" required>
+                        <div class="invalid-feedback" id="lastName-error"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                    <div class="invalid-feedback" id="email-error"></div>
+                </div>
+                
+                <!-- Student ID is auto-generated by the system; hidden from user -->
+                <input type="hidden" id="studentId" name="studentId" />
+                
+                <div class="form-row">
+                    <div class="form-group mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user me-2"></i>Username
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="invalid-feedback" id="username-error"></div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Password
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <div class="invalid-feedback" id="password-error"></div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group mb-3">
+                        <label for="phoneNumber" class="form-label">
+                            <i class="fas fa-phone me-2"></i>Phone Number
+                        </label>
+                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                        <div class="invalid-feedback" id="phoneNumber-error"></div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="dateOfBirth" class="form-label">
+                            <i class="fas fa-calendar me-2"></i>Date of Birth
+                        </label>
+                        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required>
+                        <div class="invalid-feedback" id="dateOfBirth-error"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="address" class="form-label">
+                        <i class="fas fa-map-marker-alt me-2"></i>Address
+                    </label>
+                    <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+                    <div class="invalid-feedback" id="address-error"></div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-register w-100" id="registerBtn">
+                    <span id="registerBtnText">
+                        <i class="fas fa-user-plus me-2"></i>Register
+                    </span>
+                    <span id="registerBtnSpinner" class="spinner-border spinner-border-sm ms-2" style="display: none;"></span>
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p>Already have an account? <a href="/Auth/Login">Login now</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const form = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const registerBtnText = document.getElementById('registerBtnText');
+        const registerBtnSpinner = document.getElementById('registerBtnSpinner');
+
+        // Get all form inputs
+        const inputs = form.querySelectorAll('input, textarea');
+
+        // Clear validation on input
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                input.classList.remove('is-invalid');
+                const errorElement = document.getElementById(input.id + '-error');
+                if (errorElement) errorElement.textContent = '';
+            });
+        });
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            
+            // Validate First Name
+            const firstName = document.getElementById('firstName').value.trim();
+            if (!firstName) {
+                document.getElementById('firstName').classList.add('is-invalid');
+                document.getElementById('firstName-error').textContent = 'First name is required';
+                isValid = false;
+            } else if (firstName.length < 2) {
+                document.getElementById('firstName').classList.add('is-invalid');
+                document.getElementById('firstName-error').textContent = 'First name must be at least 2 characters';
+                isValid = false;
+            }
+            
+            // Validate Last Name
+            const lastName = document.getElementById('lastName').value.trim();
+            if (!lastName) {
+                document.getElementById('lastName').classList.add('is-invalid');
+                document.getElementById('lastName-error').textContent = 'Last name is required';
+                isValid = false;
+            } else if (lastName.length < 2) {
+                document.getElementById('lastName').classList.add('is-invalid');
+                document.getElementById('lastName-error').textContent = 'Last name must be at least 2 characters';
+                isValid = false;
+            }
+            
+            // Validate Email
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                document.getElementById('email').classList.add('is-invalid');
+                document.getElementById('email-error').textContent = 'Email is required';
+                isValid = false;
+            }
+            
+            // Student ID is hidden and will be generated server-side
+            
+            // Validate Username
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                document.getElementById('username').classList.add('is-invalid');
+                document.getElementById('username-error').textContent = 'Username is required';
+                isValid = false;
+            } else if (username.length < 3) {
+                document.getElementById('username').classList.add('is-invalid');
+                document.getElementById('username-error').textContent = 'Username must be at least 3 characters';
+                isValid = false;
+            }
+            
+            // Validate Password
+            const password = document.getElementById('password').value;
+            if (!password) {
+                document.getElementById('password').classList.add('is-invalid');
+                document.getElementById('password-error').textContent = 'Password is required';
+                isValid = false;
+            } else if (password.length < 6) {
+                document.getElementById('password').classList.add('is-invalid');
+                document.getElementById('password-error').textContent = 'Password must be at least 6 characters';
+                isValid = false;
+            }
+            
+            // Validate Date of Birth
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            if (!dateOfBirth) {
+                document.getElementById('dateOfBirth').classList.add('is-invalid');
+                document.getElementById('dateOfBirth-error').textContent = 'Date of birth is required';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        // Show loading state
+        function setLoading(loading) {
+            registerBtn.disabled = loading;
+            if (loading) {
+                registerBtnText.style.display = 'none';
+                registerBtnSpinner.style.display = 'inline-block';
+            } else {
+                registerBtnText.style.display = 'inline';
+                registerBtnSpinner.style.display = 'none';
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alert-container');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+        }
+
+        // Handle form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Clear previous errors
+            inputs.forEach(input => {
+                input.classList.remove('is-invalid');
+                const errorElement = document.getElementById(input.id + '-error');
+                if (errorElement) errorElement.textContent = '';
+            });
+            
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+            
+            const formData = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                studentId: document.getElementById('studentId').value.trim(),
+                username: document.getElementById('username').value.trim(),
+                password: document.getElementById('password').value,
+                phoneNumber: document.getElementById('phoneNumber').value.trim(),
+                dateOfBirth: document.getElementById('dateOfBirth').value,
+                address: document.getElementById('address').value.trim()
+            };
+            
+            setLoading(true);
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store prefill info for login page and redirect to login
+                    try {
+                        sessionStorage.setItem('prefillUsername', document.getElementById('username').value.trim());
+                        sessionStorage.setItem('prefillPassword', document.getElementById('password').value);
+                        sessionStorage.setItem('registrationSuccess', 'Registration successful! Please log in.');
+                    } catch {}
+                    showAlert('Registration successful! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/Auth/Login';
+                    }, 800);
+                } else {
+                    // Show field-level errors similar to admin forms
+                    let errorMessage = data.message || 'Registration failed!';
+                    if (data && data.errors) {
+                        const errors = data.errors;
+                        Object.keys(errors).forEach(key => {
+                            const field = key.charAt(0).toLowerCase() + key.slice(1);
+                            const input = document.getElementById(field);
+                            if (input) {
+                                input.classList.add('is-invalid');
+                                const errEl = document.getElementById(field + '-error');
+                                if (errEl) errEl.textContent = Array.isArray(errors[key]) ? errors[key].join(', ') : String(errors[key]);
+                            }
+                        });
+                        const allMsgs = Object.values(errors).flat();
+                        if (allMsgs.length) errorMessage = errorMessage + ': ' + allMsgs.join(', ');
+                    }
+                    showAlert(errorMessage, 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Network error. Please check your connection and try again.', 'danger');
+            } finally {
+                setLoading(false);
+            }
+        });
+        
+        // Set default date to today
+        document.getElementById('dateOfBirth').value = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>

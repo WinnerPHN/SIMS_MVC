@@ -1,0 +1,849 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SIMS_APDP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .sidebar { background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); min-height: calc(100vh - 56px); }
+        .sidebar .nav-link { color: #333; padding: 12px 20px; border-radius: 8px; margin: 5px 10px; transition: all 0.3s ease; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-5px); }
+        .card-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; }
+        .btn-logout { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); border: none; color: white; }
+        .btn-logout:hover { background: linear-gradient(135deg, #c82333 0%, #bd2130 100%); color: white; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="fas fa-graduation-cap me-2"></i>SIMS_APDP</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3"><i class="fas fa-user me-2"></i>@ViewBag.Username</span>
+                <button class="btn btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h6 class="text-muted mb-3">SYSTEM MANAGEMENT</h6>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#" onclick="return showSection('dashboard', this)"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                        <a class="nav-link" href="#" onclick="return showSection('students', this)"><i class="fas fa-user-graduate me-2"></i>Manage Students</a>
+                        <a class="nav-link" href="#" onclick="return showSection('teachers', this)"><i class="fas fa-chalkboard-teacher me-2"></i>Manage Teachers</a>
+                        <a class="nav-link" href="#" onclick="return showSection('courses', this)"><i class="fas fa-book me-2"></i>Manage Courses</a>
+                        <a class="nav-link" href="#" onclick="return showSection('enrollments', this)"><i class="fas fa-users me-2"></i>Manage Enrollments</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section">
+                    <h2 class="mb-4"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h2>
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="card-icon me-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"><i class="fas fa-user-graduate"></i></div>
+                                        <div><h4 class="mb-0" id="student-count">0</h4><p class="text-muted mb-0">Students</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="card-icon me-3" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);"><i class="fas fa-chalkboard-teacher"></i></div>
+                                        <div><h4 class="mb-0" id="teacher-count">0</h4><p class="text-muted mb-0">Teachers</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="card-icon me-3" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);"><i class="fas fa-book"></i></div>
+                                        <div><h4 class="mb-0" id="course-count">0</h4><p class="text-muted mb-0">Courses</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="card-icon me-3" style="background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);"><i class="fas fa-users"></i></div>
+                                        <div><h4 class="mb-0" id="enrollment-count">0</h4><p class="text-muted mb-0">Enrollments</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header"><h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>System Statistics</h5></div>
+                                <div class="card-body">
+                                    <p>Welcome to the Student Information Management System SIMS_APDP!</p>
+                                    <p>You can use the left menu to manage system functions.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Section -->
+                <div id="students-section" style="display: none;">
+                    <h2 class="mb-4"><i class="fas fa-user-graduate me-2"></i>Manage Students</h2>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Students List</h5>
+                            <button class="btn btn-primary" onclick="return showAddStudentModal()"><i class="fas fa-plus me-2"></i>Add Student</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead><tr><th>Name</th><th>Email</th><th>Student ID</th><th>Phone</th><th>Actions</th></tr></thead>
+                                    <tbody id="students-table-body"><tr><td colspan="5" class="text-center">Loading students...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Modal -->
+                <div class="modal fade" id="studentModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="studentModalTitle">Add Student</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="studentForm" class="row g-3">
+                                    <input type="hidden" id="studentIdHidden" />
+                                    <div class="col-md-6">
+                                        <label class="form-label">First name</label>
+                                        <input type="text" class="form-control" id="studentFirstName" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last name</label>
+                                        <input type="text" class="form-control" id="studentLastName" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="studentEmail" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Student ID</label>
+                                        <input type="text" class="form-control" id="studentStudentId" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone</label>
+                                        <input type="text" class="form-control" id="studentPhone" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date of birth</label>
+                                        <input type="date" class="form-control" id="studentDob" required />
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="studentAddress" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="studentUsername" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="studentPassword" />
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="studentModalSaveBtn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teachers Section -->
+                <div id="teachers-section" style="display: none;">
+                    <h2 class="mb-4"><i class="fas fa-chalkboard-teacher me-2"></i>Manage Teachers</h2>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Teachers List</h5>
+                            <button class="btn btn-primary" onclick="return showAddTeacherModal()"><i class="fas fa-plus me-2"></i>Add Teacher</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead><tr><th>Name</th><th>Teacher ID</th><th>Email</th><th>Phone</th><th>Date of Birth</th><th>Actions</th></tr></thead>
+                                    <tbody id="teachers-table-body"><tr><td colspan="6" class="text-center">Loading teachers...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Modal -->
+                <div class="modal fade" id="teacherModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="teacherModalTitle">Add Teacher</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="teacherForm" class="row g-3">
+                                    <input type="hidden" id="teacherIdHidden" />
+                                    <div class="col-md-6"><label class="form-label">First name</label><input type="text" class="form-control" id="teacherFirstName" required /></div>
+                                    <div class="col-md-6"><label class="form-label">Last name</label><input type="text" class="form-control" id="teacherLastName" required /></div>
+                                    <div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control" id="teacherEmail" required /></div>
+                                    <div class="col-md-6"><label class="form-label">Teacher ID</label><input type="text" class="form-control" id="teacherTeacherId" required /></div>
+                                    <div class="col-md-6"><label class="form-label">Phone</label><input type="text" class="form-control" id="teacherPhone" /></div>
+                                    <div class="col-md-6"><label class="form-label">Date of birth</label><input type="date" class="form-control" id="teacherDob" /></div>
+                                    
+                                    <div class="col-12"><label class="form-label">Address</label><input type="text" class="form-control" id="teacherAddress" /></div>
+                                    <div class="col-md-6"><label class="form-label">Username</label><input type="text" class="form-control" id="teacherUsername" required /></div>
+                                    <div class="col-md-6"><label class="form-label">Password</label><input type="password" class="form-control" id="teacherPassword" /></div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="teacherModalSaveBtn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Courses Section -->
+                <div id="courses-section" style="display: none;">
+                    <h2 class="mb-4"><i class="fas fa-book me-2"></i>Manage Courses</h2>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Courses List</h5>
+                            <button class="btn btn-primary" onclick="return showAddCourseModal()"><i class="fas fa-plus me-2"></i>Add Course</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead><tr><th>Course Code</th><th>Course Name</th><th>Teacher</th><th>Credits</th><th>Actions</th></tr></thead>
+                                    <tbody id="courses-table-body"><tr><td colspan="5" class="text-center">Loading courses...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Modal -->
+                <div class="modal fade" id="courseModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="courseModalTitle">Add Course</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="courseForm" class="row g-3">
+                                    <input type="hidden" id="courseIdHidden" />
+                                    <div class="col-md-6"><label class="form-label">Code</label><input type="text" class="form-control" id="courseCode" required /></div>
+                                    <div class="col-md-6"><label class="form-label">Name</label><input type="text" class="form-control" id="courseName" required /></div>
+                                    <div class="col-12"><label class="form-label">Description</label><input type="text" class="form-control" id="courseDescription" /></div>
+                                    <div class="col-md-6"><label class="form-label">Credits</label><input type="number" min="1" max="6" class="form-control" id="courseCredits" required /></div>
+                                    <div class="col-md-6"><label class="form-label">Teacher</label>
+                                        <select class="form-select" id="courseTeacherId" required>
+                                            <option value="">-- Select teacher --</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="courseModalSaveBtn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enrollments Section -->
+                <div id="enrollments-section" style="display: none;">
+                    <h2 class="mb-4"><i class="fas fa-users me-2"></i>Manage Enrollments</h2>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <h5 class="mb-0">Enrollments</h5>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="form-label mb-0">Course:</label>
+                                    <select id="enrollmentsCourseFilter" class="form-select form-select-sm" style="min-width: 260px;" onchange="handleEnrollmentsFilterChange()">
+                                        <option value="">All courses</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" onclick="return showEnrollStudentModal()"><i class="fas fa-user-plus me-2"></i>Enroll Student</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead><tr><th>Student</th><th>Course</th><th>Enrollment Date</th><th>Status</th><th>Actions</th></tr></thead>
+                                    <tbody id="enrollments-table-body"><tr><td colspan="5" class="text-center">Loading enrollments...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enroll Modal -->
+                <div class="modal fade" id="enrollModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Enroll Student</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="enrollForm" class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Student</label>
+                                        <select class="form-select" id="enrollStudentSelect" required>
+                                            <option value="">-- Select student --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Course</label>
+                                        <select class="form-select" id="enrollCourseSelect" required>
+                                            <option value="">-- Select course --</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="enrollModalSaveBtn">Enroll</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const [studentsResponse, teachersResponse, coursesResponse, enrollmentsResponse] = await Promise.all([
+                    fetch('/api/students'), fetch('/api/teachers'), fetch('/api/courses'), fetch('/api/courses/enrollments')
+                ]);
+                if (studentsResponse.ok) { const students = await studentsResponse.json(); document.getElementById('student-count').textContent = students.length; }
+                if (teachersResponse.ok) { const teachers = await teachersResponse.json(); document.getElementById('teacher-count').textContent = teachers.length; }
+                if (coursesResponse.ok) { const courses = await coursesResponse.json(); document.getElementById('course-count').textContent = courses.length; }
+                if (enrollmentsResponse.ok) { const enrollments = await enrollmentsResponse.json(); document.getElementById('enrollment-count').textContent = enrollments.length; }
+            } catch (error) { console.error('Error loading dashboard data:', error); }
+        }
+
+        function showSection(section, linkEl) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            if (linkEl) {
+                linkEl.classList.add('active');
+            }
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('students-section').style.display = 'none';
+            document.getElementById('teachers-section').style.display = 'none';
+            document.getElementById('courses-section').style.display = 'none';
+            document.getElementById('enrollments-section').style.display = 'none';
+            document.getElementById(section + '-section').style.display = 'block';
+            switch(section) {
+                case 'students': loadStudents(); break;
+                case 'teachers': loadTeachers(); break;
+                case 'courses': loadCourses(); break;
+                case 'enrollments': loadEnrollments(); break;
+            }
+            return false;
+        }
+
+        function logout() { window.location.href = '/Auth/Login'; }
+
+        // Load Students
+        async function loadStudents() {
+            try {
+                const response = await fetch('/api/students');
+                if (response.ok) {
+                    const students = await response.json();
+                    const tbody = document.getElementById('students-table-body');
+                    tbody.innerHTML = students.map(student => `
+                        <tr>
+                            <td>${student.firstName} ${student.lastName}</td>
+                            <td>${student.email}</td>
+                            <td>${student.studentId}</td>
+                            <td>${student.phoneNumber || '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info me-1" onclick="editStudent(${student.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    document.getElementById('students-table-body').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Failed to load students</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+                document.getElementById('students-table-body').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading students</td></tr>';
+            }
+        }
+
+        // Load Teachers
+        async function loadTeachers() {
+            try {
+                const response = await fetch('/api/teachers');
+                if (response.ok) {
+                    const teachers = await response.json();
+                    const tbody = document.getElementById('teachers-table-body');
+                    tbody.innerHTML = teachers.map(teacher => `
+                        <tr>
+                            <td>${teacher.firstName} ${teacher.lastName}</td>
+                            <td>${teacher.teacherId}</td>
+                            <td>${teacher.email}</td>
+                            <td>${teacher.phoneNumber || '-'}</td>
+                            <td>${teacher.dateOfBirth ? new Date(teacher.dateOfBirth).toLocaleDateString() : '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info me-1" onclick="editTeacher(${teacher.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteTeacher(${teacher.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    document.getElementById('teachers-table-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Failed to load teachers</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading teachers:', error);
+                document.getElementById('teachers-table-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading teachers</td></tr>';
+            }
+        }
+
+        // Load Courses
+        async function loadCourses() {
+            try {
+                const response = await fetch('/api/courses');
+                if (response.ok) {
+                    const courses = await response.json();
+                    const tbody = document.getElementById('courses-table-body');
+                    tbody.innerHTML = courses.map(course => `
+                        <tr>
+                            <td>${course.code}</td>
+                            <td>${course.name}</td>
+                            <td>${course.teacherName || '-'}</td>
+                            <td>${course.credits}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info me-1" onclick="editCourse(${course.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteCourse(${course.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    document.getElementById('courses-table-body').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Failed to load courses</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading courses:', error);
+                document.getElementById('courses-table-body').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading courses</td></tr>';
+            }
+        }
+
+        // Load Enrollments
+        async function loadEnrollments() {
+            try {
+                const filterVal = document.getElementById('enrollmentsCourseFilter')?.value || '';
+                const url = filterVal ? `/api/courses/enrollments?courseId=${encodeURIComponent(filterVal)}` : '/api/courses/enrollments';
+                await ensureEnrollmentsFilterCoursesLoaded();
+                const response = await fetch(url);
+                if (response.ok) {
+                    const enrollments = await response.json();
+                    const tbody = document.getElementById('enrollments-table-body');
+                    tbody.innerHTML = enrollments.map(enrollment => `
+                        <tr>
+                            <td>${enrollment.studentName}</td>
+                            <td>${enrollment.courseName}</td>
+                            <td>${new Date(enrollment.enrolledAt).toLocaleDateString()}</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="unenrollStudent(${enrollment.id})">
+                                    <i class="fas fa-user-times"></i> Unenroll
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    document.getElementById('enrollments-table-body').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Failed to load enrollments</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading enrollments:', error);
+                document.getElementById('enrollments-table-body').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading enrollments</td></tr>';
+            }
+        }
+
+        async function ensureEnrollmentsFilterCoursesLoaded() {
+            const selectEl = document.getElementById('enrollmentsCourseFilter');
+            if (!selectEl || selectEl.dataset.loaded === 'true') return;
+            try {
+                const res = await fetch('/api/courses');
+                const list = res.ok ? await res.json() : [];
+                selectEl.innerHTML = '<option value="">All courses</option>' +
+                    list.map(c => `<option value="${c.id}">${c.code} - ${c.name}</option>`).join('');
+                selectEl.dataset.loaded = 'true';
+            } catch { /* ignore */ }
+        }
+
+        function handleEnrollmentsFilterChange() { loadEnrollments(); }
+
+        // Students CRUD (with Bootstrap modal)
+        let studentModal;
+        let studentMode = 'add'; // 'add' | 'edit'
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('studentModal');
+            if (modalEl) studentModal = new bootstrap.Modal(modalEl);
+            const saveBtn = document.getElementById('studentModalSaveBtn');
+            if (saveBtn) saveBtn.addEventListener('click', handleStudentSave);
+        });
+
+        function showAddStudentModal() {
+            studentMode = 'add';
+            document.getElementById('studentModalTitle').textContent = 'Add Student';
+            document.getElementById('studentForm').reset();
+            document.getElementById('studentPassword').required = true;
+            document.getElementById('studentIdHidden').value = '';
+            studentModal?.show();
+            return false;
+        }
+
+        async function editStudent(id) {
+            try {
+                const cur = await (await fetch(`/api/students/${id}`)).json();
+                studentMode = 'edit';
+                document.getElementById('studentModalTitle').textContent = 'Edit Student';
+                document.getElementById('studentIdHidden').value = id;
+                document.getElementById('studentFirstName').value = cur.firstName || '';
+                document.getElementById('studentLastName').value = cur.lastName || '';
+                document.getElementById('studentEmail').value = cur.email || '';
+                document.getElementById('studentStudentId').value = cur.studentId || '';
+                document.getElementById('studentPhone').value = cur.phoneNumber || '';
+                document.getElementById('studentDob').value = (cur.dateOfBirth || '').substring(0,10);
+                document.getElementById('studentAddress').value = cur.address || '';
+                document.getElementById('studentUsername').value = cur.username || '';
+                document.getElementById('studentPassword').value = '';
+                document.getElementById('studentPassword').required = false;
+                studentModal?.show();
+            } catch (e) { console.error(e); showAlert('Cannot load student details', 'danger'); }
+        }
+
+        async function handleStudentSave() {
+            const payload = {
+                firstName: document.getElementById('studentFirstName').value.trim(),
+                lastName: document.getElementById('studentLastName').value.trim(),
+                email: document.getElementById('studentEmail').value.trim(),
+                studentId: document.getElementById('studentStudentId').value.trim(),
+                phoneNumber: document.getElementById('studentPhone').value.trim() || null,
+                dateOfBirth: document.getElementById('studentDob').value,
+                address: document.getElementById('studentAddress').value.trim() || null,
+                username: document.getElementById('studentUsername').value.trim(),
+                password: document.getElementById('studentPassword').value || null
+            };
+
+            try {
+                let res;
+                if (studentMode === 'add') {
+                    res = await fetch('/api/students', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                } else {
+                    const id = document.getElementById('studentIdHidden').value;
+                    res = await fetch(`/api/students/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                }
+                if (res.ok) {
+                    studentModal?.hide();
+                    await loadStudents();
+                    showAlert(studentMode === 'add' ? 'Student created' : 'Student updated', 'success');
+                } else {
+                    const err = await res.json().catch(()=>({}));
+                    const details = Array.isArray(err.errors)
+                        ? err.errors.join(', ')
+                        : (err.errors ? Object.values(err.errors).flat().join(', ') : '');
+                    showAlert(err.message ? `${err.message}${details ? ': ' + details : ''}` : (details || 'Save failed'), 'danger');
+                }
+            } catch (e) {
+                console.error(e);
+                showAlert('Request failed', 'danger');
+            }
+        }
+
+        async function deleteStudent(id) {
+            if (!confirm('Delete this student?')) return;
+            const res = await fetch(`/api/students/${id}`, { method: 'DELETE' });
+            if (res.ok) { showAlert('Student deleted', 'success'); await loadStudents(); } else { const err = await res.json().catch(()=>({})); showAlert(err.message || 'Delete student failed', 'danger'); }
+        }
+
+        // Teachers CRUD with modal
+        let teacherModal;
+        let teacherMode = 'add';
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('teacherModal');
+            if (modalEl) teacherModal = new bootstrap.Modal(modalEl);
+            document.getElementById('teacherModalSaveBtn')?.addEventListener('click', handleTeacherSave);
+        });
+
+        function showAddTeacherModal() {
+            teacherMode = 'add';
+            document.getElementById('teacherModalTitle').textContent = 'Add Teacher';
+            document.getElementById('teacherForm').reset();
+            document.getElementById('teacherPassword').required = true;
+            document.getElementById('teacherIdHidden').value = '';
+            teacherModal?.show();
+            return false;
+        }
+
+        async function editTeacher(id) {
+            try {
+                const cur = await (await fetch(`/api/teachers/${id}`)).json();
+                teacherMode = 'edit';
+                document.getElementById('teacherModalTitle').textContent = 'Edit Teacher';
+                document.getElementById('teacherIdHidden').value = id;
+                document.getElementById('teacherFirstName').value = cur.firstName || '';
+                document.getElementById('teacherLastName').value = cur.lastName || '';
+                document.getElementById('teacherEmail').value = cur.email || '';
+                document.getElementById('teacherTeacherId').value = cur.teacherId || '';
+                document.getElementById('teacherPhone').value = cur.phoneNumber || '';
+                document.getElementById('teacherDob').value = (cur.dateOfBirth || '').substring(0,10);
+                
+                document.getElementById('teacherAddress').value = cur.address || '';
+                document.getElementById('teacherUsername').value = cur.username || '';
+                document.getElementById('teacherPassword').value = '';
+                document.getElementById('teacherPassword').required = false;
+                teacherModal?.show();
+            } catch (e) { console.error(e); showAlert('Cannot load teacher details', 'danger'); }
+        }
+
+        async function handleTeacherSave() {
+            const payload = {
+                firstName: document.getElementById('teacherFirstName').value.trim(),
+                lastName: document.getElementById('teacherLastName').value.trim(),
+                email: document.getElementById('teacherEmail').value.trim(),
+                teacherId: document.getElementById('teacherTeacherId').value.trim(),
+                phoneNumber: document.getElementById('teacherPhone').value.trim() || null,
+                dateOfBirth: document.getElementById('teacherDob').value || null,
+                address: document.getElementById('teacherAddress').value.trim() || null,
+                
+                username: document.getElementById('teacherUsername').value.trim(),
+                password: document.getElementById('teacherPassword').value || null
+            };
+            try {
+                let res;
+                if (teacherMode === 'add') {
+                    res = await fetch('/api/teachers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                } else {
+                    const id = document.getElementById('teacherIdHidden').value;
+                    res = await fetch(`/api/teachers/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                }
+                if (res.ok) { teacherModal?.hide(); await loadTeachers(); showAlert(teacherMode === 'add' ? 'Teacher created' : 'Teacher updated', 'success'); }
+                else {
+                    const err = await res.json().catch(()=>({}));
+                    const details = Array.isArray(err.errors)
+                        ? err.errors.join(', ')
+                        : (err.errors ? Object.values(err.errors).flat().join(', ') : '');
+                    showAlert(err.message ? `${err.message}${details ? ': ' + details : ''}` : (details || 'Save failed'), 'danger');
+                }
+            } catch (e) { console.error(e); showAlert('Request failed', 'danger'); }
+        }
+
+        async function deleteTeacher(id) {
+            if (!confirm('Delete this teacher?')) return;
+            const res = await fetch(`/api/teachers/${id}`, { method: 'DELETE' });
+            if (res.ok) { showAlert('Teacher deleted', 'success'); await loadTeachers(); } else { const err = await res.json().catch(()=>({})); showAlert(err.message || 'Delete teacher failed', 'danger'); }
+        }
+
+        // Courses CRUD with modal
+        let courseModal; let courseMode = 'add';
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('courseModal');
+            if (modalEl) courseModal = new bootstrap.Modal(modalEl);
+            document.getElementById('courseModalSaveBtn')?.addEventListener('click', handleCourseSave);
+        });
+
+        function showAddCourseModal() {
+            courseMode = 'add';
+            document.getElementById('courseModalTitle').textContent = 'Add Course';
+            document.getElementById('courseForm').reset();
+            document.getElementById('courseIdHidden').value = '';
+            populateTeacherDropdown();
+            courseModal?.show();
+            return false;
+        }
+
+        async function editCourse(id) {
+            try {
+                const cur = await (await fetch(`/api/courses/${id}`)).json();
+                courseMode = 'edit';
+                document.getElementById('courseModalTitle').textContent = 'Edit Course';
+                document.getElementById('courseIdHidden').value = id;
+                document.getElementById('courseCode').value = cur.code || '';
+                document.getElementById('courseName').value = cur.name || '';
+                document.getElementById('courseDescription').value = cur.description || '';
+                document.getElementById('courseCredits').value = cur.credits || '';
+                await populateTeacherDropdown(cur.teacherId || '');
+                courseModal?.show();
+            } catch (e) { console.error(e); showAlert('Cannot load course details', 'danger'); }
+        }
+
+        async function populateTeacherDropdown(selectedId = '') {
+            try {
+                const res = await fetch('/api/teachers');
+                const list = res.ok ? await res.json() : [];
+                const sel = document.getElementById('courseTeacherId');
+                sel.innerHTML = '<option value="">-- Select teacher --</option>' +
+                  list.map(t => `<option value="${t.id}" ${String(t.id)===String(selectedId)?'selected':''}>${t.firstName} ${t.lastName} (${t.teacherId})</option>`).join('');
+            } catch (e) {
+                console.error('Load teachers failed', e);
+            }
+        }
+
+        async function handleCourseSave() {
+            const code = document.getElementById('courseCode').value.trim();
+            const name = document.getElementById('courseName').value.trim();
+            const description = document.getElementById('courseDescription').value.trim() || null;
+            const credits = Number(document.getElementById('courseCredits').value);
+            const teacherIdValue = document.getElementById('courseTeacherId').value;
+            const teacherId = teacherIdValue ? Number(teacherIdValue) : NaN;
+
+            // Client validations to avoid 400 from server
+            if (code.length < 2 || code.length > 20) {
+                showAlert('Course code must be 2-20 characters', 'danger');
+                return;
+            }
+            if (name.length < 3 || name.length > 100) {
+                showAlert('Course name must be 3-100 characters', 'danger');
+                return;
+            }
+            if (!Number.isFinite(credits) || credits < 1 || credits > 999999999) {
+                showAlert('Credits must be between 1 and 999,999,999', 'danger');
+                return;
+            }
+            if (!Number.isFinite(teacherId)) {
+                showAlert('Please select a teacher', 'danger');
+                return;
+            }
+
+            const payload = { code, name, description, credits, teacherId };
+            try {
+                let res;
+                if (courseMode === 'add') {
+                    res = await fetch('/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                } else {
+                    const id = document.getElementById('courseIdHidden').value;
+                    res = await fetch(`/api/courses/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                }
+                if (res.ok) {
+                    courseModal?.hide();
+                    await loadCourses();
+                    showAlert(courseMode === 'add' ? 'Course created' : 'Course updated', 'success');
+                } else {
+                    const err = await res.json().catch(()=>({}));
+                    const details = Array.isArray(err.errors)
+                        ? err.errors.join(', ')
+                        : (err.errors ? Object.values(err.errors).flat().join(', ') : '');
+                    showAlert(err.message ? `${err.message}${details ? ': ' + details : ''}` : (details || 'Save failed'), 'danger');
+                }
+            } catch (e) { console.error(e); showAlert('Request failed', 'danger'); }
+        }
+
+        async function deleteCourse(id) {
+            if (!confirm('Delete this course?')) return;
+            const res = await fetch(`/api/courses/${id}`, { method: 'DELETE' });
+            if (res.ok) { showAlert('Course deleted', 'success'); await loadCourses(); } else { const err = await res.json().catch(()=>({})); showAlert(err.message || 'Delete course failed', 'danger'); }
+        }
+
+        // Enrollments with modal
+        let enrollModal;
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('enrollModal');
+            if (modalEl) enrollModal = new bootstrap.Modal(modalEl);
+            document.getElementById('enrollModalSaveBtn')?.addEventListener('click', handleEnrollSave);
+        });
+
+        async function showEnrollStudentModal() {
+            document.getElementById('enrollForm').reset();
+            await populateEnrollDropdowns();
+            enrollModal?.show();
+            return false;
+        }
+
+        async function handleEnrollSave() {
+            const studentVal = document.getElementById('enrollStudentSelect').value;
+            const courseVal = document.getElementById('enrollCourseSelect').value;
+            if (!studentVal || !courseVal) { showAlert('Please select student and course', 'danger'); return; }
+            const studentId = Number(studentVal);
+            const courseId = Number(courseVal);
+            const res = await fetch('/api/courses/enroll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ studentId, courseId }) });
+            if (res.ok) { enrollModal?.hide(); showAlert('Enrolled successfully', 'success'); await loadEnrollments(); } else { const err = await res.json().catch(()=>({})); showAlert(err.message || 'Enroll failed', 'danger'); }
+        }
+
+        async function populateEnrollDropdowns() {
+            try {
+                const [studentsRes, coursesRes] = await Promise.all([
+                    fetch('/api/students'),
+                    fetch('/api/courses')
+                ]);
+                const students = studentsRes.ok ? await studentsRes.json() : [];
+                const courses = coursesRes.ok ? await coursesRes.json() : [];
+                const studentSel = document.getElementById('enrollStudentSelect');
+                const courseSel = document.getElementById('enrollCourseSelect');
+                studentSel.innerHTML = '<option value="">-- Select student --</option>' +
+                    students.map(s => `<option value="${s.id}">${s.firstName} ${s.lastName} (${s.studentId})</option>`).join('');
+                courseSel.innerHTML = '<option value="">-- Select course --</option>' +
+                    courses.map(c => `<option value="${c.id}">${c.code} - ${c.name}</option>`).join('');
+            } catch (e) {
+                console.error('Failed to load dropdown data', e);
+                showAlert('Could not load students or courses', 'danger');
+            }
+        }
+
+        async function unenrollStudent(id) {
+            if (!confirm('Remove this enrollment?')) return;
+            const res = await fetch(`/api/courses/enrollments/${id}`, { method: 'DELETE' });
+            if (res.ok) { showAlert('Enrollment removed', 'success'); await loadEnrollments(); } else { const err = await res.json().catch(()=>({})); showAlert(err.message || 'Unenroll failed', 'danger'); }
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 400px; max-width: 600px;';
+            alertDiv.innerHTML = `<strong>${type === 'danger' ? 'Error' : type === 'success' ? 'Success' : 'Info'}:</strong> ${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => { if (alertDiv.parentNode) alertDiv.remove(); }, 5000);
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>
+
+

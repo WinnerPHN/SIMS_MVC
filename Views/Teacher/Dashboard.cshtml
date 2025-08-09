@@ -1,0 +1,198 @@
+@{
+    ViewData["Title"] = "Teacher Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SIMS_APDP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar {
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 56px);
+        }
+        .sidebar .nav-link {
+            color: #333;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px 10px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-logout {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none;
+            color: white;
+        }
+        .btn-logout:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            color: white;
+        }
+        .course-card {
+            border-left: 4px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>SIMS_APDP
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" id="navbar-teacher-name">
+                    <i class="fas fa-user me-2"></i>Teacher
+                </span>
+                <button class="btn btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h6 class="text-muted mb-3">TEACHER MENU</h6>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#">
+                            <i class="fas fa-book me-2"></i>My Courses
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <div id="courses-section">
+                    <h2 class="mb-4">
+                        <i class="fas fa-book me-2"></i>My Courses
+                    </h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Course</th>
+                                            <th>Code</th>
+                                            <th>Credits</th>
+                                            <th>Enrolled Students</th>
+                                            <th>Created</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="courses-tbody">
+                                        <tr>
+                                            <td colspan="6" class="text-muted">Loading...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Load teacher's assigned courses only
+        async function loadCourses() {
+            try {
+                // Try cookie first, fallback to localStorage bearer
+                let response = await fetch('/api/teachers/my-courses', { cache: 'no-store' });
+                if (response.status === 401 || response.status === 403) {
+                    const token = localStorage.getItem('token');
+                    if (!token) { window.location.href = '/Auth/Login'; return; }
+                    response = await fetch('/api/teachers/my-courses', {
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        cache: 'no-store'
+                    });
+                }
+
+                const tbody = document.getElementById('courses-tbody');
+                if (!response.ok) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-danger">Failed to load courses</td></tr>';
+                    return;
+                }
+                const courses = await response.json();
+                if (!courses || courses.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-muted">No courses yet.</td></tr>';
+                    return;
+                }
+                const rows = courses.map((c, idx) => `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${c.name}</td>
+                        <td>${c.code}</td>
+                        <td>${c.credits}</td>
+                        <td>${c.enrolledStudentsCount}</td>
+                        <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US') : ''}</td>
+                    </tr>
+                `).join('');
+                tbody.innerHTML = rows;
+
+                // Load teacher name for navbar
+                let profileRes = await fetch('/api/teachers/me', { cache: 'no-store' });
+                if (!profileRes.ok) {
+                    const token = localStorage.getItem('token');
+                    if (token) profileRes = await fetch('/api/teachers/me', { headers: { 'Authorization': `Bearer ${token}` }, cache: 'no-store' });
+                }
+                if (profileRes.ok) {
+                    const me = await profileRes.json();
+                    const name = `${me.firstName} ${me.lastName}`.trim();
+                    const el = document.getElementById('navbar-teacher-name');
+                    if (el && name) el.innerHTML = `<i class="fas fa-user me-2"></i>${name}`;
+                }
+            } catch (error) {
+                console.error('Error loading courses:', error);
+                const tbody = document.getElementById('courses-tbody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-danger">Error loading courses</td></tr>';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('role');
+            window.location.href = '/Auth/Login';
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadCourses);
+    </script>
+</body>
+</html>
